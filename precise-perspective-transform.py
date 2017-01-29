@@ -23,7 +23,7 @@ The GNU Public License is available at
 http://www.gnu.org/copyleft/gpl.html
 '''
 
-from __future__ import print_function, unicode_literals
+from __future__ import print_function, unicode_literals, division
 from itertools import izip as zip
 
 import numpy as np
