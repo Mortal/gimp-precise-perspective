@@ -241,7 +241,7 @@ if __name__ == '__main__':
         'Mathias Rav',  # Author
         '2017 Mathias Rav',  # Copyright notice
         '2017 Jan 29',  # Date
-        _('Easier Perspective...'),  # Menu label
+        _('Precise perspective transform'),  # Menu label
         'RGB*,GRAY*',
         [
             (PF_IMAGE,    'img',      _('Input image'),    None),
