@@ -23,6 +23,7 @@ The GNU Public License is available at
 http://www.gnu.org/copyleft/gpl.html
 '''
 
+from __future__ import print_function, unicode_literals
 import numpy as np
 from gimpfu import _, gimp, main, PF_DRAWABLE, PF_IMAGE, register
 
