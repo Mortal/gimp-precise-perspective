@@ -1,37 +1,54 @@
 #!/usr/bin/env python2
 # encoding: utf8
 
-"""
-Easier perspective
-"""
+'''
+Gimp plugin "Precise perspective transform"
+
+Author:
+Mathias Rav
+
+License:
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+The GNU Public License is available at
+http://www.gnu.org/copyleft/gpl.html
+'''
 
 import numpy as np
 from gimpfu import _, gimp, main, PF_DRAWABLE, PF_IMAGE, register
 
 import gettext
-locale_directory = gimp.locale_directory
-gettext.install("gimp20", locale_directory, unicode=True)
+gettext.install('gimp20', gimp.locale_directory, unicode=True)
 
 # img, = gimp.image_list()
 
 
-def python_fu_easier_perspective(img, drawable):
+def python_fu_precise_perspective_transform(img, drawable):
     if not img.active_vectors:
-        raise ValueError("Image must have a path.")
+        raise ValueError('Image must have a path.')
 
     vec = img.active_vectors
 
     if len(vec.strokes) != 2:
         raise ValueError(
-            "Active image path should have exactly two components.")
+            'Active image path should have exactly two components.')
 
     s1, s2 = vec.strokes
     p1, b1 = s1.points
     p2, b2 = s2.points
     if b1 is not False:
-        raise ValueError("b1 is not False")
+        raise ValueError('b1 is not False')
     if b2 is not False:
-        raise ValueError("b2 is not False")
+        raise ValueError('b2 is not False')
 
     q1 = quad_from_path(p1)
     q2 = quad_from_path(p2)
@@ -100,7 +117,7 @@ def _coeff_property(i, j):
 
     return property(
         fget, fset, None,
-        "The (%d, %d)-entry of the matrix" % (i, j))
+        'The (%d, %d)-entry of the matrix' % (i, j))
 
 
 def _coeff_properties(n, m):
@@ -108,7 +125,7 @@ def _coeff_properties(n, m):
 
 
 class Quadrilateral(object):
-    """
+    '''
     Transformation between world coordinates (R x R)
     and quadrilateral-local coordinates ([0, 1] x [0, 1]).
     Quadrilateral corners are x0,y0 to x3,y3 in the world,
@@ -119,13 +136,13 @@ class Quadrilateral(object):
     [w ]   [g  h  i] [1].
 
     Based on "Projective Mappings for Image Warping" by Paul Heckbert, 1999.
-    """
+    '''
 
     def __init__(self, xy):
         xy = np.asarray(xy)
         if xy.shape != (2, 4):
             raise TypeError(
-                "xy must be (2, 4) with corners in columns, not %r" %
+                'xy must be (2, 4) with corners in columns, not %r' %
                 (xy.shape,))
         x, y = xy
         self.A = np.eye(3)
@@ -170,7 +187,7 @@ class Quadrilateral(object):
         x = np.asarray(x)
         if x.shape[0] != 2 or x.ndim != 2:
             raise TypeError(
-                "data matrix must have 2 rows; invalid shape is %r"
+                'data matrix must have 2 rows; invalid shape is %r'
                 % (x.shape,))
         x1 = np.asarray((x[0], x[1], np.ones_like(x[0])))
         Ax = np.dot(A, x1)
@@ -179,15 +196,15 @@ class Quadrilateral(object):
         return np.asarray((res_x, res_y))
 
     def to_world(self, uv):
-        """
+        '''
         Transform columns of uv in local space to columns of result in world.
-        """
+        '''
         return self._projective_transform(self.A, uv)
 
     def to_local(self, xy):
-        """
+        '''
         Transform columns of xy in world space to columns of result in local.
-        """
+        '''
         return self._projective_transform(self.A_inv, xy)
 
     def suggested_size(self):
@@ -207,33 +224,33 @@ class Quadrilateral(object):
 def quad_from_path(path_data):
     xs, xs_, xs__ = path_data[::6], path_data[2::6], path_data[4::6]
     if not (xs == xs_ == xs__):
-        raise ValueError("Path is not polygonal in x")
+        raise ValueError('Path is not polygonal in x')
     ys, ys_, ys__ = path_data[1::6], path_data[3::6], path_data[5::6]
     if not (ys == ys_ == ys__):
-        raise ValueError("Path is not polygonal in y")
+        raise ValueError('Path is not polygonal in y')
     if not (len(xs) == len(ys) == 4):
-        raise ValueError("Path must have exactly four vertices")
+        raise ValueError('Path must have exactly four vertices')
     return Quadrilateral((xs, ys))
 
 
-register(
-    "python-fu-easier-perspective",  # Function name
-    _(""),  # Blurb / description
-    _("Run perspective transform from two quads"),  # Help
-    "Mathias Rav",  # Author
-    _("LICENSE TODO"),  # Copyright notice
-    "2017 Jan 29",  # Date
-    _("Easier Perspective..."),  # Menu label
-    "RGB*,GRAY*",
-    [
-        (PF_IMAGE,    "img",      _("Input image"),    None),
-        (PF_DRAWABLE, "drawable", _("Input drawable"), None),
-    ],
-    [],  # No results
-    python_fu_easier_perspective,  # Internal function name
-    menu="<Image>/Filters/Distorts",  # Register in menu
-    domain=("gimp20-template", locale_directory),
-)
+if __name__ == '__main__':
+    register(
+        'python-fu-precise-perspective-transform',  # Function name
+        '',  # Blurb / description
+        _('Run perspective transform from two quads'),  # Help
+        'Mathias Rav',  # Author
+        '2017 Mathias Rav',  # Copyright notice
+        '2017 Jan 29',  # Date
+        _('Easier Perspective...'),  # Menu label
+        'RGB*,GRAY*',
+        [
+            (PF_IMAGE,    'img',      _('Input image'),    None),
+            (PF_DRAWABLE, 'drawable', _('Input drawable'), None),
+        ],
+        [],  # No results
+        python_fu_precise_perspective_transform,  # Internal function name
+        menu='<Image>/Filters/Distorts',  # Register in menu
+        domain=('gimp20-template', gimp.locale_directory),
+    )
 
-
-main()
+    main()
