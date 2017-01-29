@@ -24,6 +24,8 @@ http://www.gnu.org/copyleft/gpl.html
 '''
 
 from __future__ import print_function, unicode_literals
+from itertools import izip as zip
+
 import numpy as np
 from gimpfu import _, gimp, main, PF_DRAWABLE, PF_IMAGE, register
 
